@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANDSEETHINGSASIDO</title>
+    <style>
+        /* 让页面拥有超大的滚动空间，但隐藏默认滚动条 */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: #000; /* 配合你商店的黑色风格 */
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory; /* 核心：强制垂直滚动吸附 */
+        }
+        
+        /* 隐藏滚动条但保留滚动功能 */
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* 每一个滚动页面占满一屏 */
+        .page-section {
+            width: 100vw;
+            height: 100vh;
+            scroll-snap-align: center; /* 核心：让每个区域都居中吸附 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* 中间的主照片容器 */
+        .photo-container {
+            text-align: center;
+        }
+
+        .photo-container img {
+            max-width: 80%;
+            max-height: 80vh;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* 上下留出空白区域，供用户滑动拉扯 */
+        .spacer {
+            width: 100vw;
+            height: 100vh;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 上方的空白页：允许用户往下滑动 -->
+    <div class="spacer"></div>
+
+    <!-- 中间放置照片的吸附核心页 -->
+    <div class="page-section">
+        <div class="photo-container">
+            <!-- 请将下面的后缀改成你实际图片的格式，比如 .jpg、.png、.webp 等 -->
+            <img src="images/wwwwwww.jpg" alt="wwwwwww">
+        </div>
+    </div>
+
+    <!-- 下方的空白页：允许用户往上滑动 -->
+    <div class="spacer"></div>
+
+</body>
+</html>
