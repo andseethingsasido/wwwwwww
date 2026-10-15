@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>w</title>
+    <title>ANDSEETHINGSASIDO</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,6 @@
 
         html, body {
             width: 100%;
-            height: 100%;
             background-color: #000;
             overflow-x: hidden;
             overflow-y: auto;
@@ -25,13 +24,25 @@
             display: none;
         }
 
-        .page-container {
+        /* 下层背景照片流容器 */
+        .background-flow {
             width: 100vw;
-            height: 300vh; /* 三倍高度提供无缝循环滚动空间 */
+            display: flex;
+            flex-direction: column;
             position: relative;
+            z-index: 1; /* 处于下层 */
         }
 
-        .photo-box {
+        /* 每张背景照片铺满整个视口 */
+        .bg-photo {
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover; /* 铺满屏幕，保持比例 */
+            display: block;
+        }
+
+        /* 上层居中固定的 logo / 照片容器 */
+        .fixed-overlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -40,55 +51,36 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            pointer-events: none;
-            will-change: transform;
-            transform: translate3d(0, 0, 0);
+            pointer-events: none; /* 让鼠标事件穿透，不影响下层的滚动 */
+            z-index: 10; /* 确保悬浮在最上层 */
         }
 
-        .photo-box img {
-            width: 50vw; /* 缩小至二分之一大小 */
-            max-height: 50vh;
+        /* 锁死尺寸为 50vw / 50vh 的居中图形 */
+        .fixed-overlay img {
+            width: 50vw;
+            height: 50vh;
             object-fit: contain;
             display: block;
+            will-change: transform;
+            transform: translateZ(0); /* 开启 GPU 加速防卡顿 */
         }
     </style>
 </head>
 <body>
 
-    <div class="page-container" id="container">
-        <div class="photo-box" id="photoBox">
-            <img src="images/wwwwwww.jpg" alt="wwwwwww">
-        </div>
+    <!-- 上层：居中固定显示的 wwwwwww.png，尺寸 50vw / 50vh -->
+    <div class="fixed-overlay">
+        <img src="images/wwwwwww.png" alt="wwwwwww">
     </div>
 
-    <script>
-        const photoBox = document.getElementById('photoBox');
-        let winHeight = window.innerHeight;
+    <!-- 下层：正常铺满屏幕并可上下滚动的背景照片 (shu.jpg 和 and.jpg) -->
+    <div class="background-flow">
+        <img class="bg-photo" src="images/shu.jpg" alt="shu">
+        <img class="bg-photo" src="images/and.jpg" alt="and">
+        <!-- 如果需要无限循环或者更多照片，可以在这里继续添加 -->
+        <img class="bg-photo" src="images/shu.jpg" alt="shu">
+        <img class="bg-photo" src="images/and.jpg" alt="and">
+    </div>
 
-        function updateScroll() {
-            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-            // 让图片位置跟随滚动产生自然的位移反馈，彻底解决“无法滑动”的问题
-            // 同时利用多出来的滚动空间实现视觉平移
-            let offsetY = (scrollTop - winHeight);
-            photoBox.style.transform = `translate3d(0, ${-offsetY}px, 0)`;
-
-            // 无限循环核心：当滚动到接近顶部或底部时，无感重置原生滚动位置，实现无限上下循环
-            if (scrollTop >= winHeight * 2) {
-                window.scrollTo(0, scrollTop - winHeight);
-            } else if (scrollTop <= 0) {
-                window.scrollTo(0, scrollTop + winHeight);
-            }
-        }
-
-        window.addEventListener('scroll', updateScroll, { passive: true });
-
-        window.addEventListener('resize', () => {
-            winHeight = window.innerHeight;
-        });
-
-        // 初始让页面停在中间区域
-        window.scrollTo(0, winHeight);
-    </script>
 </body>
 </html>
