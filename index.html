@@ -14,11 +14,11 @@
         html, body {
             width: 100%;
             height: 100%;
-            background-color: #000; /* 纯黑背景 */
-            overflow: hidden; /* 隐藏默认滚动条，由自定义JS接管平滑无缝滚动 */
+            background-color: #000;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* 滚动视口容器 */
         .viewport {
             width: 100vw;
             height: 100vh;
@@ -26,9 +26,9 @@
             justify-content: center;
             align-items: center;
             position: relative;
+            overflow: hidden;
         }
 
-        /* 照片容器：尺寸缩小三分之一（即原尺寸的约66.7%） */
         .photo-box {
             position: absolute;
             width: 100vw;
@@ -36,29 +36,30 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            /* 开启 GPU 硬件加速与渲染优化 */
+            transform: translate3d(0, 0, 0);
             will-change: transform;
         }
 
         .photo-box img {
-            width: 66.7vw; /* 宽度缩小三分之一 */
-            max-height: 66.7vh; /* 高度限制在视口的 66.7% 内 */
+            width: 66.7vw; /* 缩小三分之一 */
+            max-height: 66.7vh;
             object-fit: contain;
             display: block;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            pointer-events: none;
+            transform: translateZ(0); /* 强制图片独立图层渲染 */
         }
     </style>
 </head>
 <body>
 
     <div class="viewport" id="viewport">
-        <!-- 为了实现无缝循环，我们在页面中渲染 3 个相同的照片轨道 -->
         <div class="photo-box" id="track1"><img src="images/wwwwwww.jpg" alt="wwwwwww"></div>
         <div class="photo-box" id="track2"><img src="images/wwwwwww.jpg" alt="wwwwwww"></div>
         <div class="photo-box" id="track3"><img src="images/wwwwwww.jpg" alt="wwwwwww"></div>
     </div>
 
     <script>
-        const viewport = document.getElementById('viewport');
         const tracks = [
             document.getElementById('track1'),
             document.getElementById('track2'),
@@ -66,16 +67,16 @@
         ];
 
         let totalHeight = window.innerHeight;
-        let currentScrollY = totalHeight; // 初始停留在中间轨道
+        let currentScrollY = totalHeight; 
         let targetScrollY = totalHeight;
 
-        // 监听鼠标滚轮事件
+        // 优化滚轮响应
         window.addEventListener('wheel', (e) => {
-            targetScrollY += e.deltaY * 0.8; // 调节滚动速度
+            targetScrollY += e.deltaY * 0.55; 
             e.preventDefault();
         }, { passive: false });
 
-        // 监听触控板/手机滑动事件
+        // 优化触控响应
         let touchStartY = 0;
         window.addEventListener('touchstart', (e) => {
             touchStartY = e.touches[0].clientY;
@@ -84,17 +85,16 @@
         window.addEventListener('touchmove', (e) => {
             const touchY = e.touches[0].clientY;
             const deltaY = touchStartY - touchY;
-            targetScrollY += deltaY * 1.2;
+            targetScrollY += deltaY * 1.1;
             touchStartY = touchY;
             e.preventDefault();
         }, { passive: false });
 
-        // 平滑动画循环与无缝坐标重置
         function animate() {
-            // 缓动算法 (Lerp)，让滚动丝滑跟随
-            currentScrollY += (targetScrollY - currentScrollY) * 0.1;
+            // 提高插值响应速度，消除拖泥带水感
+            currentScrollY += (targetScrollY - currentScrollY) * 0.2;
 
-            // 无缝循环的核心逻辑：当滚动超出上下边界时，瞬间把目标位置拉回中间，实现无限循环
+            // 完美的无缝循环边界控制
             if (currentScrollY >= totalHeight * 2) {
                 currentScrollY -= totalHeight;
                 targetScrollY -= totalHeight;
@@ -103,20 +103,23 @@
                 targetScrollY += totalHeight;
             }
 
-            // 让 3 个轨道错开排列，实现循环滚动展示
-            tracks[0].style.transform = `translateY(${0 - currentScrollY}px)`;
-            tracks[1].style.transform = `translateY(${totalHeight - currentScrollY}px)`;
-            tracks[2].style.transform = `translateY(${totalHeight * 2 - currentScrollY}px)`;
+            // 使用 translate3d 强制走独立图层和 GPU 渲染，彻底杜绝掉帧和卡顿
+            const y1 = 0 - currentScrollY;
+            const y2 = totalHeight - currentScrollY;
+            const y3 = totalHeight * 2 - currentScrollY;
+
+            tracks[0].style.transform = `translate3d(0, ${y1}px, 0)`;
+            tracks[1].style.transform = `translate3d(0, ${y2}px, 0)`;
+            tracks[2].style.transform = `translate3d(0, ${y3}px, 0)`;
 
             requestAnimationFrame(animate);
         }
 
-        // 窗口大小改变时自适应高度
         window.addEventListener('resize', () => {
             totalHeight = window.innerHeight;
         });
 
-        animate();
+        requestAnimationFrame(animate);
     </script>
 </body>
 </html>
