@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ANDSEETHINGSASIDO</title>
+    <title>w</title>
     <style>
         * {
             margin: 0;
@@ -33,15 +33,14 @@
             z-index: 1;
         }
 
-        /* 背景照片铺满整个视口 */
+        /* 背景照片：宽度100vw左右铺满，高度自适应原始比例，上下无缝拼接 */
         .bg-photo {
             width: 100vw;
-            height: 100vh;
-            object-fit: cover;
+            height: auto;
             display: block;
         }
 
-        /* 上层居中固定的 wwwwwww.jpg */
+        /* 上层居中固定的 wwwwwww.jpg (尺寸 50vw / 50vh) */
         .fixed-overlay {
             position: fixed;
             top: 0;
@@ -66,17 +65,17 @@
 </head>
 <body>
 
-    <!-- 上层：固定居中的 wwwwwww.jpg (尺寸 50vw / 50vh) -->
+    <!-- 上层：固定居中的 wwwwwww.jpg -->
     <div class="fixed-overlay">
         <img src="images/wwwwwww.jpg" alt="wwwwwww">
     </div>
 
-    <!-- 下层：正常铺满屏幕并可滚动的 shu.jpg 和 and.jpg -->
+    <!-- 下层：左右铺满屏幕，and.jpg 在上、shu.jpg 在下交替循环 -->
     <div class="background-flow">
-        <img class="bg-photo" src="images/shu.jpg" alt="shu">
         <img class="bg-photo" src="images/and.jpg" alt="and">
         <img class="bg-photo" src="images/shu.jpg" alt="shu">
         <img class="bg-photo" src="images/and.jpg" alt="and">
+        <img class="bg-photo" src="images/shu.jpg" alt="shu">
     </div>
 
 </body>
