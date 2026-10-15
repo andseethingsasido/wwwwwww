@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>w</title>
+    <title>ANDSEETHINGSASIDO</title>
     <style>
         * {
             margin: 0;
@@ -16,18 +16,18 @@
             height: 100%;
             background-color: #000;
             overflow-x: hidden;
-            overflow-y: auto; /* 恢复原生顺滑滚动条 */
-            -webkit-overflow-scrolling: touch; /* 手机端惯性滚动 */
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
-        /* 隐藏默认滚动条但保持滚动 */
+        /* 隐藏默认滚动条但保持丝滑滚动 */
         body::-webkit-scrollbar {
             display: none;
         }
 
         .page-container {
             width: 100vw;
-            height: 300vh; /* 三倍高度提供滚动空间 */
+            height: 300vh; /* 三倍高度提供无缝循环滚动空间 */
             position: relative;
         }
 
@@ -42,12 +42,12 @@
             align-items: center;
             pointer-events: none;
             will-change: transform;
-            transform: translateZ(0);
+            transform: translate3d(0, 0, 0);
         }
 
         .photo-box img {
-            width: 66.7vw; /* 缩小三分之一 */
-            max-height: 66.7vh;
+            width: 50vw; /* 缩小至二分之一大小 */
+            max-height: 50vh;
             object-fit: contain;
             display: block;
         }
@@ -65,17 +65,23 @@
         const photoBox = document.getElementById('photoBox');
         let winHeight = window.innerHeight;
 
-        // 利用原生滚动位置直接计算位移，零延迟、绝对不卡顿
-        window.addEventListener('scroll', () => {
+        function updateScroll() {
             let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            
-            // 无限循环核心：当滚动到接近顶部或底部时，无感重置原生滚动位置
+
+            // 让图片位置跟随滚动产生自然的位移反馈，彻底解决“无法滑动”的问题
+            // 同时利用多出来的滚动空间实现视觉平移
+            let offsetY = (scrollTop - winHeight);
+            photoBox.style.transform = `translate3d(0, ${-offsetY}px, 0)`;
+
+            // 无限循环核心：当滚动到接近顶部或底部时，无感重置原生滚动位置，实现无限上下循环
             if (scrollTop >= winHeight * 2) {
                 window.scrollTo(0, scrollTop - winHeight);
             } else if (scrollTop <= 0) {
                 window.scrollTo(0, scrollTop + winHeight);
             }
-        }, { passive: true });
+        }
+
+        window.addEventListener('scroll', updateScroll, { passive: true });
 
         window.addEventListener('resize', () => {
             winHeight = window.innerHeight;
