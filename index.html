@@ -19,7 +19,7 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* 隐藏默认滚动条但保持丝滑滚动 */
+        /* 隐藏默认滚动条 */
         body::-webkit-scrollbar {
             display: none;
         }
@@ -30,18 +30,18 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            z-index: 1; /* 处于下层 */
+            z-index: 1;
         }
 
-        /* 每张背景照片铺满整个视口 */
+        /* 背景照片铺满整个视口 */
         .bg-photo {
             width: 100vw;
             height: 100vh;
-            object-fit: cover; /* 铺满屏幕，保持比例 */
+            object-fit: cover;
             display: block;
         }
 
-        /* 上层居中固定的 logo / 照片容器 */
+        /* 上层居中固定的 wwwwwww.jpg */
         .fixed-overlay {
             position: fixed;
             top: 0;
@@ -51,33 +51,30 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            pointer-events: none; /* 让鼠标事件穿透，不影响下层的滚动 */
-            z-index: 10; /* 确保悬浮在最上层 */
+            pointer-events: none; /* 鼠标事件穿透，不影响下层滚动 */
+            z-index: 10;
         }
 
-        /* 锁死尺寸为 50vw / 50vh 的居中图形 */
         .fixed-overlay img {
             width: 50vw;
             height: 50vh;
             object-fit: contain;
             display: block;
-            will-change: transform;
-            transform: translateZ(0); /* 开启 GPU 加速防卡顿 */
+            transform: translateZ(0); /* 开启 GPU 硬件加速 */
         }
     </style>
 </head>
 <body>
 
-    <!-- 上层：居中固定显示的 wwwwwww.png，尺寸 50vw / 50vh -->
+    <!-- 上层：固定居中的 wwwwwww.jpg (尺寸 50vw / 50vh) -->
     <div class="fixed-overlay">
-        <img src="images/wwwwwww.png" alt="wwwwwww">
+        <img src="images/wwwwwww.jpg" alt="wwwwwww">
     </div>
 
-    <!-- 下层：正常铺满屏幕并可上下滚动的背景照片 (shu.jpg 和 and.jpg) -->
+    <!-- 下层：正常铺满屏幕并可滚动的 shu.jpg 和 and.jpg -->
     <div class="background-flow">
         <img class="bg-photo" src="images/shu.jpg" alt="shu">
         <img class="bg-photo" src="images/and.jpg" alt="and">
-        <!-- 如果需要无限循环或者更多照片，可以在这里继续添加 -->
         <img class="bg-photo" src="images/shu.jpg" alt="shu">
         <img class="bg-photo" src="images/and.jpg" alt="and">
     </div>
