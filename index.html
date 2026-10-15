@@ -15,30 +15,34 @@
             width: 100%;
             height: 100%;
             background-color: #000;
-            overflow: hidden;
-            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            overflow-y: auto; /* 恢复原生顺滑滚动条 */
+            -webkit-overflow-scrolling: touch; /* 手机端惯性滚动 */
         }
 
-        .viewport {
+        /* 隐藏默认滚动条但保持滚动 */
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        .page-container {
             width: 100vw;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            height: 300vh; /* 三倍高度提供滚动空间 */
             position: relative;
-            overflow: hidden;
         }
 
         .photo-box {
-            position: absolute;
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100vw;
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            /* 开启 GPU 硬件加速与渲染优化 */
-            transform: translate3d(0, 0, 0);
+            pointer-events: none;
             will-change: transform;
+            transform: translateZ(0);
         }
 
         .photo-box img {
@@ -46,80 +50,39 @@
             max-height: 66.7vh;
             object-fit: contain;
             display: block;
-            pointer-events: none;
-            transform: translateZ(0); /* 强制图片独立图层渲染 */
         }
     </style>
 </head>
 <body>
 
-    <div class="viewport" id="viewport">
-        <div class="photo-box" id="track1"><img src="images/wwwwwww.jpg" alt="wwwwwww"></div>
-        <div class="photo-box" id="track2"><img src="images/wwwwwww.jpg" alt="wwwwwww"></div>
-        <div class="photo-box" id="track3"><img src="images/wwwwwww.jpg" alt="wwwwwww"></div>
+    <div class="page-container" id="container">
+        <div class="photo-box" id="photoBox">
+            <img src="images/wwwwwww.jpg" alt="wwwwwww">
+        </div>
     </div>
 
     <script>
-        const tracks = [
-            document.getElementById('track1'),
-            document.getElementById('track2'),
-            document.getElementById('track3')
-        ];
+        const photoBox = document.getElementById('photoBox');
+        let winHeight = window.innerHeight;
 
-        let totalHeight = window.innerHeight;
-        let currentScrollY = totalHeight; 
-        let targetScrollY = totalHeight;
-
-        // 优化滚轮响应
-        window.addEventListener('wheel', (e) => {
-            targetScrollY += e.deltaY * 0.55; 
-            e.preventDefault();
-        }, { passive: false });
-
-        // 优化触控响应
-        let touchStartY = 0;
-        window.addEventListener('touchstart', (e) => {
-            touchStartY = e.touches[0].clientY;
+        // 利用原生滚动位置直接计算位移，零延迟、绝对不卡顿
+        window.addEventListener('scroll', () => {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            // 无限循环核心：当滚动到接近顶部或底部时，无感重置原生滚动位置
+            if (scrollTop >= winHeight * 2) {
+                window.scrollTo(0, scrollTop - winHeight);
+            } else if (scrollTop <= 0) {
+                window.scrollTo(0, scrollTop + winHeight);
+            }
         }, { passive: true });
 
-        window.addEventListener('touchmove', (e) => {
-            const touchY = e.touches[0].clientY;
-            const deltaY = touchStartY - touchY;
-            targetScrollY += deltaY * 1.1;
-            touchStartY = touchY;
-            e.preventDefault();
-        }, { passive: false });
-
-        function animate() {
-            // 提高插值响应速度，消除拖泥带水感
-            currentScrollY += (targetScrollY - currentScrollY) * 0.2;
-
-            // 完美的无缝循环边界控制
-            if (currentScrollY >= totalHeight * 2) {
-                currentScrollY -= totalHeight;
-                targetScrollY -= totalHeight;
-            } else if (currentScrollY <= 0) {
-                currentScrollY += totalHeight;
-                targetScrollY += totalHeight;
-            }
-
-            // 使用 translate3d 强制走独立图层和 GPU 渲染，彻底杜绝掉帧和卡顿
-            const y1 = 0 - currentScrollY;
-            const y2 = totalHeight - currentScrollY;
-            const y3 = totalHeight * 2 - currentScrollY;
-
-            tracks[0].style.transform = `translate3d(0, ${y1}px, 0)`;
-            tracks[1].style.transform = `translate3d(0, ${y2}px, 0)`;
-            tracks[2].style.transform = `translate3d(0, ${y3}px, 0)`;
-
-            requestAnimationFrame(animate);
-        }
-
         window.addEventListener('resize', () => {
-            totalHeight = window.innerHeight;
+            winHeight = window.innerHeight;
         });
 
-        requestAnimationFrame(animate);
+        // 初始让页面停在中间区域
+        window.scrollTo(0, winHeight);
     </script>
 </body>
 </html>
